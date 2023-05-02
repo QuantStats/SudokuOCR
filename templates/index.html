@@ -1,0 +1,15 @@
+<!doctype html>
+<title>Upload an Image</title>
+<h1>Upload an Image</h1>
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <input type="submit" value="Upload">
+</form>
+{% if image_base64 %}
+    <img src="data:image/png;base64,{{ image_base64 }}" alt="Uploaded Image">
+{% endif %}
+{% if output_table %}
+    <h2>Model Output:</h2>
+    {{ output_table|safe }}
+{% endif %}
+
