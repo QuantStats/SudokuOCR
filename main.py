@@ -39,14 +39,14 @@ def upload_image():
             return "No selected file", 400
         if file and allowed_file(file.filename):
             img_data = file.read()
-            output = np.random.rand(3, 3)
-            output_table = pd.DataFrame(output).to_html(header=False, index=False)
 
-            # Decode the image again for displaying
+            # Decode the image
             np_arr = np.frombuffer(img_data, np.uint8)
-            img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-            image_base64 = convert_image_to_base64(img)
+            img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+            color_img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+            image_base64 = convert_image_to_base64(color_img)
 
+            output_table = pd.DataFrame(output).to_html(header=False, index=False)
     return render_template('index.html', image_base64=image_base64, output_table=output_table)
 
 
