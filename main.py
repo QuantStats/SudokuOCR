@@ -1,9 +1,14 @@
-import uuid
+import threading
 import cv2
 import base64
 import numpy as np
 import tensorflow as tf
 import pandas as pd
+
+import detect
+import locate
+import solver
+
 from pathlib import Path
 from flask import Flask, render_template, request
 
@@ -14,9 +19,10 @@ app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB max upload size
 
 app.config['UPLOAD_FOLDER'].mkdir(parents=True, exist_ok=True)
 
+lock = threading.RLock()
+
 # Load your saved TensorFlow model
 model = tf.keras.models.load_model('models/digit_recognition_model5.h5')
-
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -43,10 +49,18 @@ def upload_image():
             # Decode the image
             np_arr = np.frombuffer(img_data, np.uint8)
             img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+
+            # Solve the detected image
+            cells = locate.parse_grid(img)
+            digits = detect.recognize_digits(cells, model)
+            with lock:
+              solver.grid = detect.create_board(digits)
+              solver.solve()
+              output = solver.solved_grid
+            output_table = pd.DataFrame(output).to_html(header=False, index=False)
+
             color_img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
             image_base64 = convert_image_to_base64(color_img)
-
-            output_table = pd.DataFrame(output).to_html(header=False, index=False)
     return render_template('index.html', image_base64=image_base64, output_table=output_table)
 
 

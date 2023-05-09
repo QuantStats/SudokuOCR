@@ -1,5 +1,8 @@
 import numpy as np
 
+grid = None
+solved_grid = None
+
 
 def no_duplicate(ls):
     # remove zeros
@@ -68,6 +71,8 @@ def feasible(y, x, n):
 
 def solve():
     global grid
+    global solved_grid
+    
     for y in range(9):
         for x in range(9):
             if grid[y][x] == 0:
@@ -81,4 +86,5 @@ def solve():
                         grid[y][x] = 0
                 return # exit the recursion
     # if there are no zeroes left, print
-    return grid.copy()
+    solved_grid = grid.copy()
+

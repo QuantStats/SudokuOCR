@@ -37,8 +37,6 @@ def pre_process_image(img, skip_dilate=False):
         kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]], np.uint8)
         proc = cv2.dilate(proc, kernel)
 
-    show_image(proc)
-
     return proc
 
 
@@ -111,9 +109,6 @@ def infer_grid(img):
             p1 = (i * side, j * side)  # Top left corner of a bounding box
             p2 = ((i + 1) * side, (j + 1) * side)  # Bottom right corner of bounding box
             squares.append((p1, p2))
-    print(len(squares))
-    for i in [19, 29]:
-        print(squares[i-1])
     return squares
 
 
@@ -283,7 +278,7 @@ def parse_grid(img):
     processed = pre_process_image(img)
 
     corners = find_corners_of_largest_polygon(processed)
-    cropped = crop_and_warp(original, corners)
+    cropped = crop_and_warp(img, corners)
 
     squares = infer_grid(cropped)
     digits = get_digits(cropped, squares, 28)
